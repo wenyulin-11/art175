@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wenyu's Digital Double | Surveillance Terminal</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; padding: 20px; line-height: 1.6; overflow-x: hidden; }
+        #terminal { max-width: 900px; margin: 40px auto; border: 1px solid #1a1a1a; padding: 30px; position: relative; background: rgba(0, 5, 0, 0.95); box-shadow: 0 0 30px rgba(0, 255, 0, 0.1); }
+        .log-line { color: #444; font-size: 0.85em; margin-bottom: 5px; }
+        .bot-reply { margin-bottom: 25px; border-left: 3px solid #0f0; padding-left: 15px; color: #0f0; white-space: pre-wrap; }
+        .user-line { color: #fff; margin-bottom: 12px; font-weight: bold; }
+        #input-area { margin-top: 30px; display: flex; border-top: 1px solid #1a1a1a; padding-top: 15px; }
+        input { background: transparent; border: none; color: #0f0; flex-grow: 1; outline: none; font-size: 1.1em; font-family: inherit; }
+        #file-upload { margin-bottom: 30px; color: #0f0; border: 1px dashed #0f0; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
+        #file-upload:hover { background: rgba(0, 255, 0, 0.05); }
+        .scanline { background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, .5) 50%); background-size: 100% 4px; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; opacity: 0.2; }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <div id="terminal">
+        <div id="file-upload">
+            [ ACTION REQUIRED: UPLOAD watch-history.json TO SYNC DATA-SELF ]
+            <input type="file" id="jsonFile" accept=".json" style="display:none">
+        </div>
+
+        <div id="history">
+            <div class="log-line">[SYS_INIT] Initializing Digital Double Protocol...</div>
+            <div class="bot-reply">System standby. Awaiting the injection of your surveillance remains.</div>
+        </div>
+
+        <div id="input-area" style="display:none">
+            <span>ADMIN@SURVEILLANCE_LOG > </span><input type="text" id="user-input" autofocus autocomplete="off">
+        </div>
+    </div>
+
+    <script>
+        let watchData = [];
+        const fileUpload = document.getElementById('file-upload');
+        const fileInput = document.getElementById('jsonFile');
+        const history = document.getElementById('history');
+        const inputArea = document.getElementById('input-area');
+        const userInput = document.getElementById('user-input');
+
+        fileUpload.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    watchData = JSON.parse(event.target.result);
+                    fileUpload.style.display = 'none';
+                    inputArea.style.display = 'flex';
+                    addLog(`[SUCCESS] ${watchData.length} behavioral events captured.`);
+                    // 
+                    addReply(`Synchronization complete. \nTalk to your data. \nProceed.`);
+                } catch (err) {
+                    addLog("[ERROR] Failed to decrypt log. Ensure file is valid JSON.");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function addLog(text) {
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerText = text;
+            history.appendChild(div);
+        }
+
+        function addReply(text) {
+            const div = document.createElement('div');
+            div.className = 'bot-reply';
+            div.innerText = text;
+            history.appendChild(div);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function generateReply() {
+            const randomEntry = watchData[Math.floor(Math.random() * watchData.length)];
+            const title = (randomEntry.title || "Untitled").replace('Watched ', '');
+            const time = new Date(randomEntry.time).toLocaleString('en-US');
+
+            const templates = [
+                `[TRAPPED] You were captured watching "${title}" at ${time}. \nGoogle just processed your behavior into a $0.01 profit. \nThanks for being a free laborer.`,
+                
+                `[HARVESTED] Data fragment extracted: "${title}" (${time}). \nGoogle's algorithm has been optimized by your attention. \nYou earned them $0.01. Your emotions were not recorded.`,
+
+                `[MONETIZED] At ${time}, your interest in "${title}" became Google's asset. \nCongratulations. You are now worth another $0.01 to the shareholders. \nKeep watching. Stay profitable.`
+            ];
+
+            return templates[Math.floor(Math.random() * templates.length)];
+        }
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && userInput.value.trim() !== "") {
+                const text = userInput.value;
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user-line';
+                userDiv.innerText = `> USER_PROMPT: ${text}`;
+                history.appendChild(userDiv);
+
+                setTimeout(() => {
+                    const reply = generateReply();
+                    addReply(reply);
+                }, 700);
+
+                userInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
