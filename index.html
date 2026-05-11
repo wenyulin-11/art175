@@ -83,16 +83,18 @@
             const time = new Date(randomEntry.time).toLocaleString('en-US');
 
             const templates = [
+                // 1. 
                 `[TRAPPED] You were captured watching "${title}" at ${time}. \nGoogle just processed your behavior into a $0.01 profit. \nThanks for being a free laborer.`,
                 
+                // 2. 
                 `[HARVESTED] Data fragment extracted: "${title}" (${time}). \nGoogle's algorithm has been optimized by your attention. \nYou earned them $0.01. Your emotions were not recorded.`,
 
-                `[MONETIZED] At ${time}, your interest in "${title}" became Google's asset. \nCongratulations. You are now worth another $0.01 to the shareholders. \nKeep watching. Stay profitable.`
+                // 3. 
+                `[AFFECTIVE_INFERENCE] System captured data: User watched "${title}" at ${time}. \nStatus: Human emotion unreadable by current sensors. \nAction: Inferring mood based on genre classification...`
             ];
 
             return templates[Math.floor(Math.random() * templates.length)];
         }
-
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && userInput.value.trim() !== "") {
                 const text = userInput.value;
